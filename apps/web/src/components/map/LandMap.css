@@ -1,0 +1,46 @@
+.land-map-container {
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Leaflet popup styling */
+.land-map-container :global(.leaflet-popup-content-wrapper) {
+  border-radius: 0.375rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.land-map-container :global(.leaflet-popup-content) {
+  margin: 0;
+  padding: 0;
+}
+
+.parcel-popup {
+  padding: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.parcel-popup strong {
+  font-weight: 600;
+}
+
+/* Leaflet controls */
+.land-map-container :global(.leaflet-control) {
+  background: white;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.land-map-container :global(.leaflet-top),
+.land-map-container :global(.leaflet-bottom) {
+  z-index: 10;
+}
+
+/* Hover effect on polygons */
+.land-map-container :global(.leaflet-interactive:hover) {
+  opacity: 0.85 !important;
+  cursor: pointer;
+}
+
+

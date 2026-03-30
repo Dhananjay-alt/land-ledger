@@ -1,0 +1,17 @@
+{
+  "name": "@land-registry/shared",
+  "version": "0.1.0",
+  "description": "Shared types, ABIs, and addresses for Land Registry",
+  "main": "index.ts",
+  "types": "index.ts",
+  "files": [
+    "abi",
+    "addresses",
+    "types"
+  ],
+  "exports": {
+    "./types": "./types/index.ts",
+    "./abi": "./abi/index.ts",
+    "./addresses": "./addresses/index.ts"
+  }
+}

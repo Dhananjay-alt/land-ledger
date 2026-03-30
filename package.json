@@ -1,0 +1,23 @@
+{
+  "name": "land-registry",
+  "version": "0.1.0",
+  "description": "Blockchain-based land registry with interactive map UI",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "web:dev": "pnpm -C apps/web dev",
+    "web:build": "pnpm -C apps/web build",
+    "web:preview": "pnpm -C apps/web preview",
+    "contracts:test": "pnpm -C contracts test",
+    "contracts:coverage": "pnpm -C contracts coverage",
+    "contracts:gas": "pnpm -C contracts test --gas-report"
+  },
+  "workspaces": [
+    "apps/web",
+    "contracts",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "pnpm": "^8.0.0"
+  }
+}

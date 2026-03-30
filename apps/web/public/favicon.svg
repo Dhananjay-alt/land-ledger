@@ -1,0 +1,11 @@
+/* eslint-disable */
+import type { SVGProps } from 'react'
+
+const SVG = (props: SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" {...props}>
+    <circle cx="50" cy="50" r="48" fill="#2563eb" />
+    <path d="M50 20v60M20 50h60" stroke="white" strokeWidth="4" />
+  </svg>
+)
+
+export default SVG

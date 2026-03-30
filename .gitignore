@@ -1,0 +1,47 @@
+# Dependencies
+/node_modules
+/lib
+.pnp
+.pnp.js
+
+# Testing
+coverage
+/cache
+
+# Production
+/out
+/dist
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Misc
+.DS_Store
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Forge specific
+broadcast/
+cache/
