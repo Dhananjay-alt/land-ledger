@@ -27,6 +27,8 @@ contract LandRegistry is AccessControl {
     }
 
     mapping(uint256 => Parcel) private parcels;
+    uint256[] private parcelIds;
+    mapping(uint256 => uint256) private parcelIdIndex;
 
     event ParcelRegistered(
         uint256 indexed parcelId,
@@ -80,6 +82,10 @@ contract LandRegistry is AccessControl {
             frozen: false,
             exists: true
         });
+
+        // Track parcel ID for enumeration
+        parcelIdIndex[parcelId] = parcelIds.length;
+        parcelIds.push(parcelId);
 
         emit ParcelRegistered(parcelId, owner, areaSqMeters, polygonHash, metadataCID);
     }
@@ -175,5 +181,34 @@ contract LandRegistry is AccessControl {
             p.frozen,
             p.exists
         );
+    }
+
+    /// @notice Get total number of registered parcels
+    function getParcelCount() external view returns (uint256) {
+        return parcelIds.length;
+    }
+
+    /// @notice Get all registered parcel IDs
+    function getAllParcelIds() external view returns (uint256[] memory) {
+        return parcelIds;
+    }
+
+    /// @notice Get a paginated list of parcel IDs
+    function getPaginatedParcelIds(uint256 offset, uint256 limit) external view returns (uint256[] memory) {
+        uint256 totalCount = parcelIds.length;
+        if (offset >= totalCount) {
+            return new uint256[](0);
+        }
+
+        uint256 end = offset + limit;
+        if (end > totalCount) {
+            end = totalCount;
+        }
+
+        uint256[] memory result = new uint256[](end - offset);
+        for (uint256 i = offset; i < end; i++) {
+            result[i - offset] = parcelIds[i];
+        }
+        return result;
     }
 }

@@ -1,98 +1,33 @@
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
-import { LandMap } from '@/components/map/LandMap'
 import { ConnectWallet } from '@/components/common/ConnectWallet'
 import { ParcelDetails } from '@/components/parcel/ParcelDetails'
+import { ParcelList } from '@/components/parcel/ParcelList'
 import { useGetParcel } from '@/features/parcels/hooks/useParcel'
-import type { MapParcel } from '@/components/map/LandMap'
-
-// Sample parcel data for demo (Chhatrapati Sambhajinagar, MH)
-// Coordinates are [latitude, longitude] and generated in meters so footprint matches area.
-const MAP_CENTER: [number, number] = [19.8762, 75.3433]
-const METERS_PER_DEGREE_LAT = 111_320
-const METERS_PER_DEGREE_LNG = 111_320 * Math.cos((MAP_CENTER[0] * Math.PI) / 180)
-
-function createRectPolygon(
-  center: [number, number],
-  widthMeters: number,
-  heightMeters: number,
-): [number, number][] {
-  const latOffset = (heightMeters / 2) / METERS_PER_DEGREE_LAT
-  const lngOffset = (widthMeters / 2) / METERS_PER_DEGREE_LNG
-
-  return [
-    [center[0] + latOffset, center[1] - lngOffset],
-    [center[0] + latOffset, center[1] + lngOffset],
-    [center[0] - latOffset, center[1] + lngOffset],
-    [center[0] - latOffset, center[1] - lngOffset],
-  ]
-}
-
-const SAMPLE_PARCELS: MapParcel[] = [
-  {
-    id: BigInt(2111),
-    name: 'Survey 21/11 - Primary Plot',
-    owner: '0xaB8483F64d9C6d1EcF9B849Ae677dD3315835cb2',
-    area: 1800,
-    coordinates: createRectPolygon([19.8762, 75.3433], 45, 40),
-    frozen: false,
-    onSelect: () => {},
-  },
-  {
-    id: BigInt(2110),
-    name: 'Survey 21/10 - Adjacent Plot',
-    owner: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
-    area: 2200,
-    coordinates: createRectPolygon([19.8765, 75.3425], 55, 40),
-    frozen: true, // Disputed/Frozen
-    onSelect: () => {},
-  },
-  {
-    id: BigInt(2109),
-    name: 'Survey 21/9 - Residential Plot',
-    owner: '0x70997970C51812e339D9B73b0245ad59Ba27A64c',
-    area: 1200,
-    coordinates: createRectPolygon([19.8758, 75.3440], 30, 40),
-    frozen: false,
-    onSelect: () => {},
-  },
-  {
-    id: BigInt(2201),
-    name: 'City Block 22/1 - Commercial',
-    owner: '0x3C44CdDdB6a900c6671B6d3B5b5F3A1c088c2b35E',
-    area: 3000,
-    coordinates: createRectPolygon([19.8768, 75.3444], 60, 50),
-    frozen: true, // Disputed
-    onSelect: () => {},
-  },
-  {
-    id: BigInt(2304),
-    name: 'Layout 23/4 - Open Land',
-    owner: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
-    area: 6400,
-    coordinates: createRectPolygon([19.8753, 75.3429], 80, 80),
-    frozen: false,
-    onSelect: () => {},
-  },
-]
+import { useRealParcelsData } from '@/features/parcels/hooks/useRealParcelsData'
+import { MOCK_PARCELS_16 } from '@/features/parcels/mocks/mockParcels'
 
 export default function App() {
   const { isConnected } = useAccount()
   const [selectedParcelId, setSelectedParcelId] = useState<bigint | undefined>()
 
   const { parcel } = useGetParcel(selectedParcelId)
+  const { parcels: realParcels, parcelCount, isLoading: isLoadingParcels, error: errorParcels } = useRealParcelsData()
 
-  const parcelsWithHandlers = SAMPLE_PARCELS.map((p) => ({
-    ...p,
-    onSelect: setSelectedParcelId,
-  }))
+  // Use real parcels from contract if available, fallback to mock data
+  const displayParcels = realParcels.length > 0 ? realParcels : MOCK_PARCELS_16
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-primary">🏡 Land Registry</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-primary">🏡 Land Registry</h1>
+            {isConnected && parcelCount > 0 && (
+              <p className="text-sm text-gray-600 mt-1">{parcelCount} parcels on blockchain</p>
+            )}
+          </div>
           <ConnectWallet />
         </div>
       </header>
@@ -109,23 +44,33 @@ export default function App() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex gap-4 p-4">
-          {/* Map */}
-          <div className="flex-1 rounded-lg overflow-hidden">
-            <LandMap 
-              parcels={parcelsWithHandlers}
-              center={MAP_CENTER}
+        <div className="flex-1 flex gap-4 p-4 max-w-7xl mx-auto w-full">
+          {/* Parcel List */}
+          <div className="flex-1 bg-white rounded-lg shadow p-6 overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4">Land Parcels</h2>
+            {errorParcels && (
+              <div className="bg-orange-50 rounded-lg p-4 border border-orange-200 mb-4">
+                <p className="text-orange-700 font-semibold text-sm">⚠️ Contract Issue</p>
+                <p className="text-orange-600 text-xs mt-1">
+                  Showing demo parcels. Deploy contract to Polygon Amoy to use real data.
+                </p>
+              </div>
+            )}
+            <ParcelList
+              parcels={displayParcels}
               selectedParcelId={selectedParcelId}
+              onSelectParcel={setSelectedParcelId}
+              isLoading={isLoadingParcels}
             />
           </div>
 
-          {/* Sidebar */}
-          <div className="w-96 overflow-y-auto space-y-4">
+          {/* Sidebar - Parcel Details & Transfer Form */}
+          <div className="w-96 bg-white rounded-lg shadow p-6 overflow-y-auto">
             {selectedParcelId && parcel ? (
               <ParcelDetails parcelId={selectedParcelId} parcel={parcel} />
             ) : (
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-gray-600">Select a parcel on the map to view details</p>
+              <div className="text-center py-8">
+                <p className="text-gray-600 text-sm">Select a parcel to view details and manage transfers</p>
               </div>
             )}
           </div>

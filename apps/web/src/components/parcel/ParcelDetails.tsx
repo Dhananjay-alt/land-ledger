@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { useRequestTransfer } from '@/features/transfer/hooks/useTransfer'
-import { shortenAddress } from '@/lib/utils'
 import type { Parcel } from '@land-registry/shared/types'
 
 interface ParcelDetailsProps {
@@ -14,14 +13,29 @@ export function ParcelDetails({ parcelId, parcel }: ParcelDetailsProps) {
   const { requestTransfer, isPending } = useRequestTransfer()
   const [transferTo, setTransferTo] = useState('')
   const [showTransferForm, setShowTransferForm] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const isOwner = address?.toLowerCase() === parcel.owner.toLowerCase()
 
   const handleRequestTransfer = () => {
-    if (transferTo) {
+    setError(null)
+    if (!transferTo) {
+      setError('Please enter a recipient address')
+      return
+    }
+
+    if (transferTo.length !== 42 || !transferTo.startsWith('0x')) {
+      setError('Invalid Ethereum address format')
+      return
+    }
+
+    try {
       requestTransfer(parcelId, transferTo as `0x${string}`)
       setTransferTo('')
       setShowTransferForm(false)
+    } catch (err) {
+      setError('Failed to request transfer')
+      console.error(err)
     }
   }
 
@@ -76,6 +90,12 @@ export function ParcelDetails({ parcelId, parcel }: ParcelDetailsProps) {
         <div className="border-t pt-4">
           <h3 className="font-semibold mb-2">Request Transfer</h3>
 
+          {error && (
+            <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
           {!showTransferForm ? (
             <button
               onClick={() => setShowTransferForm(true)}
@@ -89,7 +109,10 @@ export function ParcelDetails({ parcelId, parcel }: ParcelDetailsProps) {
                 type="text"
                 placeholder="Recipient address (0x...)"
                 value={transferTo}
-                onChange={(e) => setTransferTo(e.target.value)}
+                onChange={(e) => {
+                  setTransferTo(e.target.value)
+                  setError(null)
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <div className="flex gap-2">
@@ -104,6 +127,7 @@ export function ParcelDetails({ parcelId, parcel }: ParcelDetailsProps) {
                   onClick={() => {
                     setShowTransferForm(false)
                     setTransferTo('')
+                    setError(null)
                   }}
                   className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
                 >
@@ -112,6 +136,14 @@ export function ParcelDetails({ parcelId, parcel }: ParcelDetailsProps) {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {parcel.frozen && (
+        <div className="border-t pt-4 bg-red-50 p-3 rounded border border-red-200">
+          <p className="text-red-700 text-sm">
+            <strong>🔒 Frozen</strong> - This parcel is frozen and cannot be transferred until the freeze is lifted.
+          </p>
         </div>
       )}
     </div>

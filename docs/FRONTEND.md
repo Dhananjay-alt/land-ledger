@@ -111,8 +111,8 @@ requestTransfer(parcelId, recipientAddress)
 ## How It Works
 
 ### User Flow
-1. User connects wallet (MetaMask on Sepolia)
-2. Map loads with sample parcels
+1. User connects wallet (MetaMask on Polygon Amoy testnet)
+2. Map loads with parcel data from blockchain
 3. User clicks a polygon to view details
 4. If owner, can click "Initiate Transfer"
 5. Enter recipient address, confirm transaction
@@ -206,7 +206,7 @@ pnpm install
 ```
 
 ### Wallet not connecting
-- Ensure MetaMask is on **Sepolia** network
+- Ensure MetaMask is on **Polygon Amoy** network
 - Check WalletConnect Project ID is set
 
 ### Map not rendering

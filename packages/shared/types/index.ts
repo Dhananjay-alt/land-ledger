@@ -28,3 +28,4 @@ export interface QueryResult<T> {
   data: T | null;
   status: TransactionStatus;
   error?: Error;
+}

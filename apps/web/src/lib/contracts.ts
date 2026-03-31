@@ -1,10 +1,10 @@
-import { sepolia } from 'viem/chains'
+import { polygonAmoy } from 'viem/chains'
 import { CONTRACTS } from '@land-registry/shared/addresses'
 import { LandRegistryABI } from '@land-registry/shared/abi'
 
-export const SEPOLIA_CHAIN = sepolia
+export const AMOY_CHAIN = polygonAmoy
 
-export const LAND_REGISTRY_ADDRESS = CONTRACTS.sepolia.LandRegistry as `0x${string}`
+export const LAND_REGISTRY_ADDRESS = CONTRACTS.amoy.LandRegistry as `0x${string}`
 
 export const LAND_REGISTRY_ABI = LandRegistryABI as const
 

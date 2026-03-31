@@ -1,7 +1,7 @@
 // Network-specific deployed addresses
 export const CONTRACTS = {
-  sepolia: {
-    LandRegistry: "0x10811b35C2fF9B7773d31577179Bc88825b286A2" as const,
+  amoy: {
+    LandRegistry: "0xFB13060eD323481bC692C075FAE287b33d43b33e" as const,
   },
 } as const;
 
@@ -13,7 +13,7 @@ export function getContractAddress(
 ): string {
   const address = CONTRACTS[chain][contract];
   if (!address || address === "0x") {
-    throw new Error(`Contract ${contract} not deployed on ${chain}`);
+    throw new Error(`Contract ${contract} not deployed on ${chain}. Update packages/shared/addresses/index.ts after deployment.`);
   }
   return address;
 }
